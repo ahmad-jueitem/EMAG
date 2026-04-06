@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Calculator, Play, RotateCcw, Info, AlertTriangle, ChevronRight } from "lucide-react";
 import KatexRenderer from "@/components/KatexRenderer";
@@ -99,6 +99,16 @@ export default function SolverPage({
   const filtered = selectedCategory === "All"
     ? SOLVER_PROBLEMS
     : SOLVER_PROBLEMS.filter(p => p.category === selectedCategory);
+
+  // Derive live numeric inputs for real-time 3D visualization (fallback to 0 if not entered)
+  const liveInputs = useMemo(() => {
+    const res: Record<string, number> = {};
+    for (const inp of selectedProblem.inputs) {
+      const raw = parseFloat(inputs[inp.key] ?? "");
+      res[inp.key] = isNaN(raw) ? 0 : raw;
+    }
+    return res;
+  }, [inputs, selectedProblem]);
 
   const handleSolve = useCallback(() => {
     setError("");
@@ -376,24 +386,15 @@ export default function SolverPage({
               )}
             </AnimatePresence>
 
-            {/* 3D Field Visualization — appears after solving */}
-            <AnimatePresence>
-              {result && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <SolverVisualizer
-                    problemId={selectedProblem.id}
-                    inputs={Object.fromEntries(
-                      selectedProblem.inputs.map(inp => [inp.key, parseFloat(inputs[inp.key] ?? "0") || 0])
-                    )}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* 3D Field Visualization — always-on, real-time updates with inputs */}
+            <motion.div
+              key={`viz-${selectedProblem.id}`}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 22 }}
+            >
+              <SolverVisualizer problemId={selectedProblem.id} inputs={liveInputs} />
+            </motion.div>
           </div>
         </LayoutGroup>
       </div>

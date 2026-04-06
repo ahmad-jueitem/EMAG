@@ -276,10 +276,14 @@ export default function Sidebar({
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/[0.06]">
+        <div className="p-4 border-t border-white/[0.06] space-y-2">
           <div className="bg-white/[0.03] backdrop-blur-md rounded-xl p-3 border border-white/[0.06]">
-            <p className="text-slate-400 text-xs">Princess Sumaya University</p>
-            <p className="text-blue-400 text-xs font-medium mt-0.5">Electromagnetics I · Comm. Eng.</p>
+            <p className="text-slate-400 text-xs">Universal EMag Master Suite</p>
+            <p className="text-blue-400 text-xs font-medium mt-0.5">Princess Sumaya University</p>
+          </div>
+          <div className="bg-gradient-to-r from-blue-600/10 to-cyan-600/10 backdrop-blur-md rounded-xl p-3 border border-blue-500/20">
+            <p className="text-slate-500 text-[10px] uppercase tracking-widest">Architect</p>
+            <p className="text-cyan-300 text-xs font-bold mt-0.5">Built by Ahmad Jueitem</p>
           </div>
         </div>
       </aside>

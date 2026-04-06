@@ -1,7 +1,44 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, Component, ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Line, Sphere, Torus, Cylinder } from "@react-three/drei";
 import * as THREE from "three";
+
+// ─── WebGL detection (synchronous, before any Canvas mount) ───────────────────
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
+
+// ─── WebGL Error Boundary (fallback if canvas throws after mount) ─────────────
+class WebGLErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return <WebGLFallback />;
+    }
+    return this.props.children;
+  }
+}
+
+function WebGLFallback() {
+  return (
+    <div className="h-52 w-full flex flex-col items-center justify-center gap-2 bg-slate-900/40 rounded-xl border border-white/5">
+      <div className="text-3xl opacity-30">⚡</div>
+      <p className="text-slate-500 text-xs text-center max-w-48">3D visualization requires WebGL.<br/>Enable hardware acceleration in your browser.</p>
+    </div>
+  );
+}
 
 // ─── Scene: Point Charge (E-field flux lines) ─────────────────────────────────
 function PointChargeScene({ Q }: { Q: number }) {
@@ -403,22 +440,29 @@ export default function SolverVisualizer({
         <div className="text-slate-600 text-xs italic">Drag to orbit · Scroll to zoom</div>
       </div>
       <div className="h-52 w-full relative">
-        <Canvas
-          camera={{ position: [3, 2.5, 3.5], fov: 48 }}
-          style={{ background: "transparent" }}
-          gl={{ alpha: true, antialias: true }}
-        >
-          <ambientLight intensity={0.4} />
-          <directionalLight position={[3, 4, 2]} intensity={0.6} />
-          <SceneSelector problemId={problemId} inputs={inputs} />
-          <OrbitControls
-            enablePan={false}
-            minDistance={2}
-            maxDistance={8}
-            autoRotate
-            autoRotateSpeed={1.2}
-          />
-        </Canvas>
+        {isWebGLAvailable() ? (
+          <WebGLErrorBoundary>
+            <Canvas
+              camera={{ position: [3, 2.5, 3.5], fov: 48 }}
+              style={{ background: "transparent" }}
+              gl={{ alpha: true, antialias: true, failIfMajorPerformanceCaveat: false }}
+              onCreated={({ gl }) => { gl.setClearColor(0x000000, 0); }}
+            >
+              <ambientLight intensity={0.4} />
+              <directionalLight position={[3, 4, 2]} intensity={0.6} />
+              <SceneSelector problemId={problemId} inputs={inputs} />
+              <OrbitControls
+                enablePan={false}
+                minDistance={2}
+                maxDistance={8}
+                autoRotate
+                autoRotateSpeed={1.2}
+              />
+            </Canvas>
+          </WebGLErrorBoundary>
+        ) : (
+          <WebGLFallback />
+        )}
       </div>
     </div>
   );

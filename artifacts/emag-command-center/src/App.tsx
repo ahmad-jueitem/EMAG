@@ -116,7 +116,10 @@ function App() {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="text-white font-bold text-sm">EMag Command Center</h1>
+          <div className="flex-1">
+            <h1 className="text-white font-bold text-sm">Universal EMag Master Suite</h1>
+            <p className="text-cyan-400 text-[10px] font-medium">Built by Ahmad Jueitem</p>
+          </div>
         </div>
 
         {/* Page content */}

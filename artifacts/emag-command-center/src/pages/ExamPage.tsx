@@ -288,7 +288,18 @@ export default function ExamPage() {
   const q = questions[currentQ];
 
   return (
-    <div className="h-full flex flex-col gap-4 p-6 overflow-auto">
+    <div className={`h-full flex flex-col gap-4 p-6 overflow-auto transition-all duration-500
+      ${timeDanger ? "ring-2 ring-inset ring-red-500/50 shadow-[inset_0_0_40px_rgba(239,68,68,0.12)]" : ""}`}
+    >
+      {/* PANIC MODE overlay strip */}
+      {timeDanger && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          className="fixed inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent z-50 pointer-events-none"
+        />
+      )}
       {/* Timer + Progress bar */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-mono font-bold text-lg transition-all

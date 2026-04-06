@@ -1,3 +1,5 @@
+import { CH1_FLASHCARDS } from "./flashcards-ch1";
+
 export interface Formula {
   id: string;
   name: string;
@@ -502,7 +504,16 @@ export const SOLVER_PROBLEMS: SolverProblem[] = [
   },
 ];
 
+// Convert CH1_FLASHCARDS to unified format and merge
+const ch1CardsMerged = CH1_FLASHCARDS.map(c => ({
+  term: c.front,
+  definition: c.back,
+  formula: c.latex,
+  chapter: c.chapter,
+}));
+
 export const FLASHCARDS = [
+  ...ch1CardsMerged,
   { term: "Coulomb's Law", definition: "The force between two point charges is proportional to the product of the charges and inversely proportional to the square of the distance between them.", formula: "\\mathbf{F} = \\frac{Q_1 Q_2}{4\\pi\\varepsilon_0 R^2}\\hat{a}_R", chapter: "ch2" },
   { term: "Gauss's Law", definition: "The total electric flux out of any closed surface equals the net charge enclosed divided by the permittivity of free space.", formula: "\\oint_S \\mathbf{D} \\cdot d\\mathbf{S} = Q_{enc}", chapter: "ch2" },
   { term: "Divergence Theorem", definition: "The surface integral of a vector field over a closed surface equals the volume integral of the divergence of that field over the enclosed volume.", formula: "\\oint_S \\mathbf{A} \\cdot d\\mathbf{S} = \\int_V (\\nabla \\cdot \\mathbf{A})\\,dV", chapter: "ch1" },
