@@ -2,7 +2,23 @@
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+pnpm workspace monorepo using TypeScript. Includes the **EMag Ultimate Command Center** — a professional-grade electromagnetics study app for Princess Sumaya University Electromagnetics I.
+
+## EMag Command Center (`artifacts/emag-command-center`)
+
+**Stack:** React + Vite, Tailwind CSS, KaTeX, Framer Motion, React Three Fiber / Three.js  
+**Port:** 18109 | **Preview:** `/`
+
+### Features
+- **Universal Solver** — 12 problem types with physics guardrails (validates distance≠0, εᵣ>0, etc.), step-by-step KaTeX solutions, Framer Motion layout transitions
+- **3D Field Visualizer** — React Three Fiber: point charge E-field, electric dipole, magnetic wire B-field with vector arrows, orbit controls
+- **Coordinate Transformer** — Cartesian ↔ Cylindrical ↔ Spherical point and vector transforms with full math
+- **Exam Mode** — 20-min timed mock exam, dot progress bar, chapter breakdown, mistake review with PDF references
+- **Knowledge Base** — 8 chapters with KaTeX equations, searchable
+- **Flashcards** — 20 cards, shuffle, chapter filter
+- **Auto-Quiz** — 12 randomized MCQ with explanations
+- **Constants & Unit Converter** — 6 constants, 5 converters
+- **Sidebar** — Glassmorphism (backdrop-blur-2xl), Core Modules + Advanced Tools sections, Recently Used Solvers tracker
 
 ## Stack
 
