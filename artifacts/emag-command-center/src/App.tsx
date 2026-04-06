@@ -10,6 +10,8 @@ import ConstantsPage from "@/pages/ConstantsPage";
 import FieldViewerPage from "@/pages/FieldViewerPage";
 import CoordTransformPage from "@/pages/CoordTransformPage";
 import ExamPage from "@/pages/ExamPage";
+import AnalyticsPage from "@/pages/AnalyticsPage";
+import ResourceVaultPage from "@/pages/ResourceVaultPage";
 import "katex/dist/katex.min.css";
 
 interface RecentSolver { id: string; name: string }
@@ -45,6 +47,14 @@ function App() {
     setQuizMastery(mastery);
   }, []);
 
+  const handleAnalyticsNavigate = useCallback((tab: string, jumpId?: string) => {
+    setActiveTab(tab);
+    if (tab === "solver" && jumpId) {
+      setJumpToSolver(jumpId);
+      setTimeout(() => setJumpToSolver(null), 100);
+    }
+  }, []);
+
   const renderPage = () => {
     switch (activeTab) {
       case "solver":
@@ -63,6 +73,10 @@ function App() {
         return <CoordTransformPage />;
       case "exam":
         return <ExamPage />;
+      case "analytics":
+        return <AnalyticsPage onNavigate={handleAnalyticsNavigate} />;
+      case "vault":
+        return <ResourceVaultPage onNavigate={handleAnalyticsNavigate} />;
       default:
         return <SolverPage onProblemUsed={handleProblemUsed} />;
     }

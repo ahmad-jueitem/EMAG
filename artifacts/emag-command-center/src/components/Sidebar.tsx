@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import {
   Zap, BookOpen, Brain, FlaskConical, Calculator, X, ChevronRight,
-  Box, ArrowLeftRight, Timer, Clock
+  Box, ArrowLeftRight, Timer, Clock, TrendingUp, FolderOpen
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -16,6 +16,11 @@ const ADVANCED_ITEMS = [
   { id: "fieldviewer", label: "3D Field Visualizer", icon: Box, desc: "Interactive field lines" },
   { id: "coordtransform", label: "Coord Transformer", icon: ArrowLeftRight, desc: "Cartesian ↔ Cyl ↔ Sph" },
   { id: "exam", label: "Exam Mode", icon: Timer, desc: "20-min timed mock exam" },
+];
+
+const STUDY_ITEMS = [
+  { id: "analytics", label: "Learning Analytics", icon: TrendingUp, desc: "Strengths · weakpoints · path" },
+  { id: "vault", label: "Resource Vault", icon: FolderOpen, desc: "Worksheets 1–8 + solutions" },
 ];
 
 // ─── Mastery ring component ───────────────────────────────────────────────────
@@ -206,6 +211,16 @@ export default function Sidebar({
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest px-3 pb-2">Advanced Tools</p>
             <div className="space-y-1">
               {ADVANCED_ITEMS.map(item => (
+                <NavButton key={item.id} item={item} activeTab={activeTab} onNav={handleNav} />
+              ))}
+            </div>
+          </div>
+
+          {/* Study Intelligence */}
+          <div>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest px-3 pb-2">Study Intelligence</p>
+            <div className="space-y-1">
+              {STUDY_ITEMS.map(item => (
                 <NavButton key={item.id} item={item} activeTab={activeTab} onNav={handleNav} />
               ))}
             </div>

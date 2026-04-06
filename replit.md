@@ -10,15 +10,17 @@ pnpm workspace monorepo using TypeScript. Includes the **EMag Ultimate Command C
 **Port:** 18109 | **Preview:** `/`
 
 ### Features
-- **Universal Solver** — 12 problem types with physics guardrails (validates distance≠0, εᵣ>0, etc.), step-by-step KaTeX solutions, Framer Motion layout transitions
-- **3D Field Visualizer** — React Three Fiber: point charge E-field, electric dipole, magnetic wire B-field with vector arrows, orbit controls
+- **Universal Solver** — 12 problem types with physics guardrails, step-by-step KaTeX solutions, Framer Motion layout transitions. After each solution, a **live 3D field visualization** appears (React Three Fiber): point charge flux lines, Gaussian sphere with radial arrows, Ampere line current with circular H-field rings, toroid with coil windings, capacitor with animated field particles, wave propagation scene, generic field grid.
+- **3D Field Visualizer** — React Three Fiber: dedicated tab with point charge E-field, electric dipole, magnetic wire B-field with vector arrows, orbit controls
 - **Coordinate Transformer** — Cartesian ↔ Cylindrical ↔ Spherical point and vector transforms with full math
 - **Exam Mode** — 20-min timed mock exam, dot progress bar, chapter breakdown, mistake review with PDF references
 - **Knowledge Base** — 8 chapters with KaTeX equations, searchable
-- **Flashcards** — 20 cards, shuffle, chapter filter
-- **Auto-Quiz** — 12 randomized MCQ with explanations
+- **Flashcards** — shuffle, chapter filter
+- **Pro Quiz** — 160 questions (20/chapter × 8 chapters: 5 Theory/10 Calculation/5 Edge), KaTeX solution reveal, retry-wrong, localStorage mastery tracking (`emag-quiz-mastery-v2`)
 - **Constants & Unit Converter** — 6 constants, 5 converters
-- **Sidebar** — Glassmorphism (backdrop-blur-2xl), Core Modules + Advanced Tools sections, Recently Used Solvers tracker
+- **Learning Analytics** — Recharts dashboard: Bar chart of chapter mastery (color-coded green/yellow/grey), Radar chart of skill dimensions (Theory/Calculation/Edge/Consistency/Speed), adaptive weakness cards with one-click navigation to solver/flashcards/quiz
+- **Resource Vault** — 8 worksheets × 4 problems = 32 total problems covering Ch1–Ch8, each with expandable KaTeX step-by-step solution, difficulty badges, and "Solve with Visualization" button linking to the Universal Solver
+- **Sidebar** — Glassmorphism (backdrop-blur-2xl), Mastery Ring SVG, overall mastery pill, per-chapter mastery bars, Recently Used Solvers tracker; three nav sections: Core Modules / Advanced Tools / Study Intelligence
 
 ## Stack
 

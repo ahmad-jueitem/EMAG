@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Calculator, Play, RotateCcw, Info, AlertTriangle, ChevronRight } from "lucide-react";
 import KatexRenderer from "@/components/KatexRenderer";
+import SolverVisualizer from "@/components/SolverVisualizer";
 import { SOLVER_PROBLEMS } from "@/data/formulas";
 
 const CATEGORIES = ["All", "Electrostatics", "Magnetostatics", "Materials", "Energy", "Wave Propagation", "Transmission Lines", "Magnetic Forces"];
@@ -371,6 +372,25 @@ export default function SolverPage({
                       </motion.div>
                     ))}
                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* 3D Field Visualization — appears after solving */}
+            <AnimatePresence>
+              {result && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <SolverVisualizer
+                    problemId={selectedProblem.id}
+                    inputs={Object.fromEntries(
+                      selectedProblem.inputs.map(inp => [inp.key, parseFloat(inputs[inp.key] ?? "0") || 0])
+                    )}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
