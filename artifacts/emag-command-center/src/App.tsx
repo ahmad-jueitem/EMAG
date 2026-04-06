@@ -1,16 +1,15 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import SolverPage from "@/pages/SolverPage";
 import KnowledgePage from "@/pages/KnowledgePage";
 import FlashcardsPage from "@/pages/FlashcardsPage";
-import QuizPage from "@/pages/QuizPage";
+import QuizPage, { getAllMastery } from "@/pages/QuizPage";
 import ConstantsPage from "@/pages/ConstantsPage";
 import FieldViewerPage from "@/pages/FieldViewerPage";
 import CoordTransformPage from "@/pages/CoordTransformPage";
 import ExamPage from "@/pages/ExamPage";
-import { SOLVER_PROBLEMS } from "@/data/formulas";
 import "katex/dist/katex.min.css";
 
 interface RecentSolver { id: string; name: string }
@@ -19,6 +18,15 @@ function App() {
   const [activeTab, setActiveTab] = useState("solver");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [recentSolvers, setRecentSolvers] = useState<RecentSolver[]>([]);
+  const [quizMastery, setQuizMastery] = useState<Record<string, number>>(getAllMastery());
+  const [jumpToSolver, setJumpToSolver] = useState<string | null>(null);
+
+  // Refresh mastery from localStorage on tab focus
+  useEffect(() => {
+    const handler = () => setQuizMastery(getAllMastery());
+    window.addEventListener("focus", handler);
+    return () => window.removeEventListener("focus", handler);
+  }, []);
 
   const handleProblemUsed = useCallback((id: string, name: string) => {
     setRecentSolvers(prev => {
@@ -27,13 +35,14 @@ function App() {
     });
   }, []);
 
-  // When user clicks a recent solver — switch to solver tab and pre-select
-  const [jumpToSolver, setJumpToSolver] = useState<string | null>(null);
-
   const handleRecentClick = useCallback((id: string) => {
     setActiveTab("solver");
     setJumpToSolver(id);
     setTimeout(() => setJumpToSolver(null), 100);
+  }, []);
+
+  const handleMasteryChange = useCallback((mastery: Record<string, number>) => {
+    setQuizMastery(mastery);
   }, []);
 
   const renderPage = () => {
@@ -45,7 +54,7 @@ function App() {
       case "flashcards":
         return <FlashcardsPage />;
       case "quiz":
-        return <QuizPage />;
+        return <QuizPage onMasteryChange={handleMasteryChange} />;
       case "constants":
         return <ConstantsPage />;
       case "fieldviewer":
@@ -61,7 +70,7 @@ function App() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-950">
-      {/* Subtle grid background */}
+      {/* Subtle grid */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -80,9 +89,10 @@ function App() {
         setMobileOpen={setMobileOpen}
         recentSolvers={recentSolvers}
         onRecentClick={handleRecentClick}
+        quizMastery={quizMastery}
       />
 
-      {/* Main Content */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
         {/* Mobile top bar */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-white/[0.07] bg-slate-900/60 backdrop-blur-xl flex-shrink-0">

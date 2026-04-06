@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { id: "solver", label: "Universal Solver", icon: Calculator, desc: "Step-by-step solutions" },
   { id: "knowledge", label: "Knowledge Base", icon: BookOpen, desc: "All formulas & theory" },
   { id: "flashcards", label: "Flashcards", icon: Brain, desc: "Active recall training" },
-  { id: "quiz", label: "Auto-Quiz", icon: FlaskConical, desc: "Test your knowledge" },
+  { id: "quiz", label: "Pro Quiz", icon: FlaskConical, desc: "20Q per chapter · KaTeX reveal" },
   { id: "constants", label: "Constants & Units", icon: Zap, desc: "Converter & reference" },
 ];
 
@@ -18,15 +18,34 @@ const ADVANCED_ITEMS = [
   { id: "exam", label: "Exam Mode", icon: Timer, desc: "20-min timed mock exam" },
 ];
 
-// ─── Nav button as top-level component (not nested inside Sidebar) ────────────
+// ─── Mastery ring component ───────────────────────────────────────────────────
+function MasteryRing({ pct, size = 22 }: { pct: number; size?: number }) {
+  const r = (size - 4) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  const color = pct >= 70 ? "#22c55e" : pct >= 40 ? "#eab308" : "#475569";
+  return (
+    <svg width={size} height={size} className="flex-shrink-0">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={2.5} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none"
+        stroke={color} strokeWidth={2.5}
+        strokeDasharray={`${dash} ${circ}`}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+    </svg>
+  );
+}
+
+// ─── Nav button — top-level component (not nested inside Sidebar) ─────────────
 function NavButton({
-  item,
-  activeTab,
-  onNav,
+  item, activeTab, onNav, masteryPct,
 }: {
   item: typeof NAV_ITEMS[0];
   activeTab: string;
   onNav: (id: string) => void;
+  masteryPct?: number;
 }) {
   const Icon = item.icon;
   const isActive = activeTab === item.id;
@@ -53,8 +72,30 @@ function NavButton({
         <p className={`text-sm font-medium truncate ${isActive ? "text-blue-200" : ""}`}>{item.label}</p>
         <p className="text-xs text-slate-500 truncate">{item.desc}</p>
       </div>
-      {isActive && <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0" />}
+      {masteryPct !== undefined && (
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <MasteryRing pct={masteryPct} />
+          <span className={`text-xs font-bold ${masteryPct >= 70 ? "text-green-400" : masteryPct >= 40 ? "text-yellow-400" : "text-slate-600"}`}>
+            {masteryPct}%
+          </span>
+        </div>
+      )}
+      {masteryPct === undefined && isActive && <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0" />}
     </motion.button>
+  );
+}
+
+// ─── Sidebar mastery chapter row ──────────────────────────────────────────────
+function MasteryRow({ chapter, pct }: { chapter: string; pct: number }) {
+  return (
+    <div className="flex items-center gap-2 px-3">
+      <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${pct >= 70 ? "bg-green-500" : pct >= 40 ? "bg-yellow-500" : "bg-slate-600"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -65,11 +106,12 @@ interface SidebarProps {
   setMobileOpen: (open: boolean) => void;
   recentSolvers: { id: string; name: string }[];
   onRecentClick: (id: string) => void;
+  quizMastery: Record<string, number>;
 }
 
 export default function Sidebar({
   activeTab, setActiveTab, mobileOpen, setMobileOpen,
-  recentSolvers, onRecentClick,
+  recentSolvers, onRecentClick, quizMastery,
 }: SidebarProps) {
   const handleNav = (id: string) => {
     setActiveTab(id);
@@ -77,6 +119,11 @@ export default function Sidebar({
   };
 
   const safeRecents = Array.isArray(recentSolvers) ? recentSolvers : [];
+  const safeQuizMastery = quizMastery ?? {};
+  const masteryValues = Object.values(safeQuizMastery);
+  const overallMastery = masteryValues.length > 0
+    ? Math.round(masteryValues.reduce((a, b) => a + b, 0) / masteryValues.length)
+    : 0;
 
   return (
     <>
@@ -99,9 +146,7 @@ export default function Sidebar({
           flex flex-col transition-transform duration-300
           ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
-        style={{
-          boxShadow: "inset -1px 0 0 rgba(255,255,255,0.04), 4px 0 24px rgba(0,0,0,0.4)"
-        }}
+        style={{ boxShadow: "inset -1px 0 0 rgba(255,255,255,0.04), 4px 0 24px rgba(0,0,0,0.4)" }}
       >
         {/* Logo */}
         <div className="flex items-center justify-between p-5 border-b border-white/[0.07]">
@@ -122,15 +167,36 @@ export default function Sidebar({
           </button>
         </div>
 
+        {/* Mastery overview pill */}
+        <div className="px-4 pt-3">
+          <div className="flex items-center gap-3 bg-white/[0.03] rounded-xl px-3 py-2.5 border border-white/[0.06]">
+            <MasteryRing pct={overallMastery} size={28} />
+            <div className="flex-1 min-w-0">
+              <p className="text-slate-400 text-xs">Overall Mastery</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
+                    style={{ width: `${overallMastery}%` }}
+                  />
+                </div>
+                <span className="text-orange-400 font-bold text-xs">{overallMastery}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Scrollable nav */}
         <nav className="flex-1 p-4 space-y-5 overflow-y-auto">
-
           {/* Core modules */}
           <div>
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest px-3 pb-2">Core Modules</p>
             <div className="space-y-1">
               {NAV_ITEMS.map(item => (
-                <NavButton key={item.id} item={item} activeTab={activeTab} onNav={handleNav} />
+                <NavButton
+                  key={item.id} item={item} activeTab={activeTab} onNav={handleNav}
+                  masteryPct={item.id === "quiz" ? overallMastery : undefined}
+                />
               ))}
             </div>
           </div>
@@ -144,6 +210,32 @@ export default function Sidebar({
               ))}
             </div>
           </div>
+
+          {/* Mastery breakdown (compact) */}
+          {overallMastery > 0 && (
+            <div>
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest px-3 pb-2 flex items-center gap-1.5">
+                <Brain className="w-3 h-3" /> Chapter Mastery
+              </p>
+              <div className="space-y-1.5 px-3">
+                {["ch1","ch2","ch3","ch4","ch5","ch6","ch7","ch8"].map((id, i) => {
+                  const pct = safeQuizMastery[id] ?? 0;
+                  return (
+                    <div key={id} className="flex items-center gap-2">
+                      <span className="text-slate-600 text-xs w-8">Ch{i+1}</span>
+                      <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${pct >= 70 ? "bg-green-500" : pct >= 40 ? "bg-yellow-500" : "bg-slate-600"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-slate-600 text-xs w-8 text-right">{pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Recently Used Solvers */}
           {safeRecents.length > 0 && (
