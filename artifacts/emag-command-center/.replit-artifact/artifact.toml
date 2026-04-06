@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "EMag Ultimate Command Center"
+version = "1.0.0"
+id = "artifacts/emag-command-center"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18109
+
+[services.development]
+run = "pnpm --filter @workspace/emag-command-center run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/emag-command-center", "run", "build" ]
+publicDir = "artifacts/emag-command-center/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18109"
+BASE_PATH = "/"
