@@ -160,7 +160,7 @@ export default function Sidebar({
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-white font-bold text-sm leading-tight">EMAG Student</h1>
+              <h1 className="text-white font-bold text-sm leading-tight">EMAG Center</h1>
               <p className="text-blue-400 text-xs font-medium">Toolkit</p>
             </div>
           </div>
